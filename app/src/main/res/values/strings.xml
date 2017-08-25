@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PiP demo</string>
+    <string name="gif_activity_name">GIF Viewer</string>
+    <string name="action_settings">Settings</string>
+</resources>
