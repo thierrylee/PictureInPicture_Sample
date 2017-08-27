@@ -87,8 +87,7 @@ class GifActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onBackPressed() {
         goToPictureInPictureMode()
     }
 
