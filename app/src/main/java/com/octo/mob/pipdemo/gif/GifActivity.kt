@@ -14,7 +14,6 @@ import android.view.Menu
 import android.view.View
 import com.bumptech.glide.Glide
 import com.octo.mob.pipdemo.R
-import com.octo.mob.pipdemo.extensions.getGifDrawable
 import com.octo.mob.pipdemo.extensions.isGifRunning
 import com.octo.mob.pipdemo.extensions.startGif
 import com.octo.mob.pipdemo.extensions.stopGif
@@ -40,6 +39,8 @@ class GifActivity : AppCompatActivity() {
     private var gifStateBeforePause: GifState? = null
 
     object IntentBuilder {
+        val GIF_EXTRA_KEY: String = "GIF"
+
         fun viewGif(context: Context, gifData: GifData): Intent = buildIntent(context, GifAction.View, gifData)
         fun randomGif(context: Context): Intent = buildIntent(context, GifAction.ViewRandom)
         fun play(context: Context): Intent = buildIntent(context, GifAction.Play)
@@ -48,7 +49,7 @@ class GifActivity : AppCompatActivity() {
         private fun buildIntent(context: Context, gifAction: GifAction, gifData: GifData? = null): Intent {
             val intent = Intent(gifAction.action)
             intent.setClass(context, GifActivity::class.java)
-            intent.putExtra("gif", gifData)
+            intent.putExtra(GIF_EXTRA_KEY, gifData)
             return intent
         }
     }
@@ -67,9 +68,9 @@ class GifActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
-        var gifData : GifData? = null
+        var gifData: GifData? = null
         when (intent?.action) {
-            GifAction.View.action -> gifData = intent.getParcelableExtra("gif")
+            GifAction.View.action -> gifData = intent.getParcelableExtra(IntentBuilder.GIF_EXTRA_KEY)
             GifAction.ViewRandom.action -> {
                 val gifDataList = GifCollection.getAllGifs()
                 val randomIndex = Random().nextInt(gifDataList.size)
