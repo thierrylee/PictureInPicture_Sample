@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Rational
 import android.view.Menu
 import android.view.View
-import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.octo.mob.pipdemo.R
 import com.octo.mob.pipdemo.extensions.isGifRunning
@@ -40,21 +39,10 @@ class GifActivity : AppCompatActivity() {
     private var gifStateBeforePause: GifState? = null
 
     object IntentBuilder {
-        fun viewGif(context: Context, gifResId: Int): Intent {
-            return buildIntent(context, GifAction.View, gifResId)
-        }
-
-        fun randomGif(context: Context): Intent {
-            return buildIntent(context, GifAction.ViewRandom, 0)
-        }
-
-        fun play(context: Context): Intent {
-            return buildIntent(context, GifAction.Play, 0)
-        }
-
-        fun pause(context: Context): Intent {
-            return buildIntent(context, GifAction.Pause, 0)
-        }
+        fun viewGif(context: Context, gifResId: Int): Intent = buildIntent(context, GifAction.View, gifResId)
+        fun randomGif(context: Context): Intent = buildIntent(context, GifAction.ViewRandom, 0)
+        fun play(context: Context): Intent = buildIntent(context, GifAction.Play, 0)
+        fun pause(context: Context): Intent = buildIntent(context, GifAction.Pause, 0)
 
         private fun buildIntent(context: Context, gifAction: GifAction, gifResId: Int): Intent {
             val intent = Intent(gifAction.action)
@@ -72,9 +60,7 @@ class GifActivity : AppCompatActivity() {
         onNewIntent(intent)
 
         fab.setOnClickListener { goToPictureInPictureMode() }
-        gifLayout.setOnClickListener {
-            togglePlayPause()
-        }
+        gifLayout.setOnClickListener { togglePlayPause() }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -82,20 +68,14 @@ class GifActivity : AppCompatActivity() {
 
         var gifResId = 0
         when (intent?.action) {
-            GifAction.View.action -> {
-                gifResId = intent.getIntExtra("gif", R.drawable.hello_dog)
-            }
+            GifAction.View.action -> gifResId = intent.getIntExtra("gif", R.drawable.hello_dog)
             GifAction.ViewRandom.action -> {
                 val gifDataList = GifCollection.getAllGifs()
                 val randomIndex = Random().nextInt(gifDataList.size)
                 gifResId = gifDataList[randomIndex].resId
             }
-            GifAction.Play.action -> {
-                startGif()
-            }
-            GifAction.Pause.action -> {
-                stopGif()
-            }
+            GifAction.Play.action -> startGif()
+            GifAction.Pause.action -> stopGif()
         }
 
         if (gifResId > 0) {
@@ -152,24 +132,24 @@ class GifActivity : AppCompatActivity() {
         updateOverlayVisibility(true)
     }
 
-    fun updateOverlayVisibility(isVisible : Boolean){
-        pauseOverlay.visibility = when(isVisible){
+    fun updateOverlayVisibility(isVisible: Boolean) {
+        pauseOverlay.visibility = when (isVisible) {
             true -> View.VISIBLE
             false -> View.GONE
         }
     }
 
-    fun buildPictureInPictureParams(): PictureInPictureParams {
-        // Create randomizer action
+    private fun buildRandomizerAction(): RemoteAction {
         val randomizerIntent = IntentBuilder.randomGif(this)
-        val randomizerAction = RemoteAction(
+        return RemoteAction(
                 Icon.createWithResource(this, android.R.drawable.ic_menu_rotate),
                 "Random",
                 "Random",
                 PendingIntent.getActivity(this, 0, randomizerIntent, 0)
         )
+    }
 
-        // Create play/pause action
+    private fun buildPlayPauseAction(): RemoteAction {
         val isPlaying = gifView.isGifRunning()
         val playPauseIntent = when (isPlaying) {
             true -> IntentBuilder.pause(this)
@@ -179,15 +159,21 @@ class GifActivity : AppCompatActivity() {
             true -> android.R.drawable.ic_media_pause
             false -> android.R.drawable.ic_media_play
         })
-        val playPauseAction = RemoteAction(
+        return RemoteAction(
                 playPauseIcon,
                 "Play/Pause",
                 "Play/Pause",
                 PendingIntent.getActivity(this, 0, playPauseIntent, 0))
+    }
+
+    fun buildPictureInPictureParams(): PictureInPictureParams {
+        val imgWidth = gifView.measuredWidth
+        val imgHeight = gifView.measuredHeight
+        val aspectRatio: String = Integer.toString(imgWidth) + ":" + Integer.toString(imgHeight)
 
         return PictureInPictureParams.Builder()
-                .setAspectRatio(Rational.parseRational("3:4"))
-                .setActions(listOf(randomizerAction, playPauseAction))
+                .setAspectRatio(Rational.parseRational(aspectRatio))
+                .setActions(listOf(buildRandomizerAction(), buildPlayPauseAction()))
                 .build()
     }
 

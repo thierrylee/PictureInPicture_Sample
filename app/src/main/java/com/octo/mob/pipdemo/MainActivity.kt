@@ -2,6 +2,7 @@ package com.octo.mob.pipdemo
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import com.octo.mob.pipdemo.gif.*
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity(), OnClickGifDataListener {
         val adapter = GifDataAdapter(this)
         adapter.gifDataList = GifCollection.getAllGifs()
         recyclerView.adapter = adapter
+        recyclerView.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
