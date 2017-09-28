@@ -10,8 +10,8 @@
 
     <FrameLayout
         android:id="@+id/gifLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -24,16 +24,16 @@
 
         <ImageView
             android:id="@+id/gifView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:contentDescription="@string/content_description_gif"
             android:scaleType="fitCenter"
             tools:src="@drawable/hello_pusheen" />
 
         <ImageView
             android:id="@+id/pauseOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:contentDescription="@string/content_description_pause"
             android:src="@android:drawable/ic_media_play"

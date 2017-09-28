@@ -14,6 +14,7 @@ import android.view.Menu
 import android.view.View
 import com.bumptech.glide.Glide
 import com.octo.mob.pipdemo.R
+import com.octo.mob.pipdemo.extensions.getGifDrawable
 import com.octo.mob.pipdemo.extensions.isGifRunning
 import com.octo.mob.pipdemo.extensions.startGif
 import com.octo.mob.pipdemo.extensions.stopGif
@@ -168,8 +169,8 @@ class GifActivity : AppCompatActivity() {
     }
 
     private fun buildPictureInPictureParams(): PictureInPictureParams {
-        val imgWidth = gifView.measuredWidth
-        val imgHeight = gifView.measuredHeight
+        val imgWidth = gifView.drawable.intrinsicWidth
+        val imgHeight = gifView.drawable.intrinsicHeight
         val aspectRatio: String = Integer.toString(imgWidth) + ":" + Integer.toString(imgHeight)
 
         return PictureInPictureParams.Builder()
