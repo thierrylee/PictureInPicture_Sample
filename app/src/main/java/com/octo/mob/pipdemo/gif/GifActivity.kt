@@ -114,7 +114,7 @@ class GifActivity : AppCompatActivity() {
         }
     }
 
-    fun togglePlayPause() {
+    private fun togglePlayPause() {
         val isGifRunning = gifView.isGifRunning()
         when (isGifRunning) {
             true -> gifView.stopGif()
@@ -123,17 +123,17 @@ class GifActivity : AppCompatActivity() {
         updateOverlayVisibility(isGifRunning)
     }
 
-    fun startGif() {
+    private fun startGif() {
         gifView.startGif()
         updateOverlayVisibility(false)
     }
 
-    fun stopGif() {
+    private fun stopGif() {
         gifView.stopGif()
         updateOverlayVisibility(true)
     }
 
-    fun updateOverlayVisibility(isVisible: Boolean) {
+    private fun updateOverlayVisibility(isVisible: Boolean) {
         pauseOverlay.visibility = when (isVisible) {
             true -> View.VISIBLE
             false -> View.GONE
@@ -167,7 +167,7 @@ class GifActivity : AppCompatActivity() {
                 PendingIntent.getActivity(this, 0, playPauseIntent, 0))
     }
 
-    fun buildPictureInPictureParams(): PictureInPictureParams {
+    private fun buildPictureInPictureParams(): PictureInPictureParams {
         val imgWidth = gifView.measuredWidth
         val imgHeight = gifView.measuredHeight
         val aspectRatio: String = Integer.toString(imgWidth) + ":" + Integer.toString(imgHeight)
@@ -178,7 +178,7 @@ class GifActivity : AppCompatActivity() {
                 .build()
     }
 
-    fun goToPictureInPictureMode() {
+    private fun goToPictureInPictureMode() {
         enterPictureInPictureMode(buildPictureInPictureParams())
     }
 
