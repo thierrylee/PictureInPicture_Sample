@@ -162,10 +162,14 @@ class GifActivity : AppCompatActivity() {
             true -> android.R.drawable.ic_media_pause
             false -> android.R.drawable.ic_media_play
         })
+        val playPauseDescription = getString(when (isPlaying) {
+            true -> R.string.content_description_pause
+            false -> R.string.content_description_play
+        })
         return RemoteAction(
                 playPauseIcon,
-                "Play/Pause",
-                "Play/Pause",
+                playPauseDescription,
+                playPauseDescription,
                 PendingIntent.getActivity(this, 0, playPauseIntent, 0))
     }
 
