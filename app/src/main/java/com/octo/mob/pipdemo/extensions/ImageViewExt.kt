@@ -3,18 +3,17 @@ package com.octo.mob.pipdemo.extensions
 import android.widget.ImageView
 import com.bumptech.glide.load.resource.gif.GifDrawable
 
-fun ImageView.getGifDrawable() : GifDrawable? {
-    var gifDrawable : GifDrawable? = null
+fun ImageView.getGifDrawable(): GifDrawable? {
     this.drawable?.let {
-        if (it is GifDrawable){
-            gifDrawable = it
+        if (it is GifDrawable) {
+            return it
         }
     }
-    return gifDrawable
+    return null
 }
 
-fun ImageView.isGifRunning() : Boolean = getGifDrawable()?.isRunning ?: true
+fun ImageView.isGifRunning(): Boolean = getGifDrawable()?.isRunning ?: true
 
 fun ImageView.stopGif() = getGifDrawable()?.stop()
 
-fun ImageView.viewGif() = getGifDrawable()?.start()
+fun ImageView.startGif() = getGifDrawable()?.start()
