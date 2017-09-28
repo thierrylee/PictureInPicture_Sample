@@ -39,15 +39,15 @@ class GifActivity : AppCompatActivity() {
     private var gifStateBeforePause: GifState? = null
 
     object IntentBuilder {
-        fun viewGif(context: Context, gifResId: Int): Intent = buildIntent(context, GifAction.View, gifResId)
-        fun randomGif(context: Context): Intent = buildIntent(context, GifAction.ViewRandom, 0)
-        fun play(context: Context): Intent = buildIntent(context, GifAction.Play, 0)
-        fun pause(context: Context): Intent = buildIntent(context, GifAction.Pause, 0)
+        fun viewGif(context: Context, gifData: GifData): Intent = buildIntent(context, GifAction.View, gifData)
+        fun randomGif(context: Context): Intent = buildIntent(context, GifAction.ViewRandom)
+        fun play(context: Context): Intent = buildIntent(context, GifAction.Play)
+        fun pause(context: Context): Intent = buildIntent(context, GifAction.Pause)
 
-        private fun buildIntent(context: Context, gifAction: GifAction, gifResId: Int): Intent {
+        private fun buildIntent(context: Context, gifAction: GifAction, gifData: GifData? = null): Intent {
             val intent = Intent(gifAction.action)
             intent.setClass(context, GifActivity::class.java)
-            intent.putExtra("gif", gifResId)
+            intent.putExtra("gif", gifData)
             return intent
         }
     }
@@ -66,23 +66,24 @@ class GifActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
-        var gifResId = 0
+        var gifData : GifData? = null
         when (intent?.action) {
-            GifAction.View.action -> gifResId = intent.getIntExtra("gif", R.drawable.hello_dog)
+            GifAction.View.action -> gifData = intent.getParcelableExtra("gif")
             GifAction.ViewRandom.action -> {
                 val gifDataList = GifCollection.getAllGifs()
                 val randomIndex = Random().nextInt(gifDataList.size)
-                gifResId = gifDataList[randomIndex].resId
+                gifData = gifDataList[randomIndex]
             }
             GifAction.Play.action -> startGif()
             GifAction.Pause.action -> stopGif()
         }
 
-        if (gifResId > 0) {
+        gifData?.let {
             Glide.with(this)
-                    .load(gifResId)
+                    .load(it.resId)
                     .into(gifView)
             updateOverlayVisibility(false)
+            gifView.contentDescription = it.title
         }
     }
 

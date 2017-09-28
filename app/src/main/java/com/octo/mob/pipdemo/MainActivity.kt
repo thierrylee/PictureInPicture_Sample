@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), OnClickGifDataListener {
     }
 
     override fun onClickGifData(gifData: GifData) {
-        startActivity(GifActivity.IntentBuilder.viewGif(this, gifData.resId))
+        startActivity(GifActivity.IntentBuilder.viewGif(this, gifData))
     }
 
 }

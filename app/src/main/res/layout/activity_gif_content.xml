@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:contentDescription="@string/content_description_play_pause"
+            android:contentDescription="@string/content_description_pause"
             android:src="@android:drawable/ic_media_play"
             android:visibility="gone"
             tools:visibility="visible" />

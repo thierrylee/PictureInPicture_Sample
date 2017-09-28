@@ -3,5 +3,7 @@
     <string name="gif_activity_name">GIF Viewer</string>
     <string name="action_settings">Settings</string>
     <string name="content_description_gif">GIF</string>
-    <string name="content_description_play_pause">Play / Pause</string>
+    <string name="content_description_enter_pip">Enter picture in picture mode</string>
+    <string name="content_description_pause">Pause</string>
+    <string name="content_description_play">Play</string>
 </resources>
