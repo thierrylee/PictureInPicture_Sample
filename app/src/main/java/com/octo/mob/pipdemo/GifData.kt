@@ -1,8 +1,7 @@
-package com.octo.mob.pipdemo.gif
+package com.octo.mob.pipdemo
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.octo.mob.pipdemo.R
 
 data class GifData(val title: String, val resId: Int) : Parcelable {
     constructor(parcel: Parcel) : this(

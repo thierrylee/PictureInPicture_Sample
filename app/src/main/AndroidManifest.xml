@@ -27,6 +27,22 @@
             android:launchMode="singleTask"
             android:supportsPictureInPicture="true"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <service android:name=".service.GifService">
+            <intent-filter>
+                <action android:name="ViewRandom" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="Play" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="Pause" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </service>
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.octo.mob.pipdemo.gif
+package com.octo.mob.pipdemo
 
 interface OnClickGifDataListener {
     fun onClickGifData(gifData: GifData)

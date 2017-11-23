@@ -14,6 +14,6 @@ fun ImageView.getGifDrawable(): GifDrawable? {
 
 fun ImageView.isGifRunning(): Boolean = getGifDrawable()?.isRunning ?: true
 
-fun ImageView.stopGif() = getGifDrawable()?.stop()
+fun ImageView.pauseGif() = getGifDrawable()?.stop()
 
-fun ImageView.startGif() = getGifDrawable()?.start()
+fun ImageView.playGif() = getGifDrawable()?.start()

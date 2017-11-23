@@ -3,40 +3,26 @@ package com.octo.mob.pipdemo.gif
 import android.app.PendingIntent
 import android.app.PictureInPictureParams
 import android.app.RemoteAction
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.drawable.Icon
-import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.content.LocalBroadcastManager
+import android.util.Log
 import android.util.Rational
-import android.view.Menu
 import android.view.View
-import com.bumptech.glide.Glide
+import com.octo.mob.pipdemo.GifData
 import com.octo.mob.pipdemo.R
 import com.octo.mob.pipdemo.extensions.isGifRunning
-import com.octo.mob.pipdemo.extensions.startGif
-import com.octo.mob.pipdemo.extensions.stopGif
+import com.octo.mob.pipdemo.service.GifService
 import kotlinx.android.synthetic.main.activity_gif.*
 import kotlinx.android.synthetic.main.activity_gif_content.*
-import java.util.*
 
-private enum class GifAction(val action: String) {
-    View("View"),
-    ViewRandom("ViewRandom"),
-    Play("Play"),
-    Pause("Pause")
-    ;
-}
+class GifActivity : AbstractGifActivity() {
 
-private enum class GifState {
-    Play,
-    Pause
-}
-
-class GifActivity : AppCompatActivity() {
-
-    private var gifStateBeforePause: GifState? = null
+    private val receiver = RemoteActionBroadcastReceiver()
 
     object IntentBuilder {
         val GIF_EXTRA_KEY: String = "GIF"
@@ -54,101 +40,86 @@ class GifActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_gif)
-        setSupportActionBar(toolbar)
-
-        onNewIntent(intent)
-
-        fab.setOnClickListener { goToPictureInPictureMode() }
-        gifLayout.setOnClickListener { togglePlayPause() }
-    }
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
-        var gifData: GifData? = null
         when (intent?.action) {
-            GifAction.View.action -> gifData = intent.getParcelableExtra(IntentBuilder.GIF_EXTRA_KEY)
-            GifAction.ViewRandom.action -> {
-                val gifDataList = GifCollection.getAllGifs()
-                val randomIndex = Random().nextInt(gifDataList.size)
-                gifData = gifDataList[randomIndex]
-            }
-            GifAction.Play.action -> startGif()
-            GifAction.Pause.action -> stopGif()
-        }
-
-        gifData?.let {
-            Glide.with(this)
-                    .load(it.resId)
-                    .into(gifView)
-            updateOverlayVisibility(false)
-            gifView.contentDescription = it.title
+            GifAction.View.action -> controller.loadGif(intent.getParcelableExtra(GifActivity.IntentBuilder.GIF_EXTRA_KEY))
+            GifAction.ViewRandom.action -> controller.loadRandomGif()
+            GifAction.Play.action -> controller.playGif()
+            GifAction.Pause.action -> controller.pauseGif()
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onPause() {
+    override fun onPause(gifStateBeforePause: GifState) {
         if (!isInPictureInPictureMode) {
-            gifStateBeforePause = when (gifView.isGifRunning()) {
-                true -> GifState.Play
-                false -> GifState.Pause
-            }
-            stopGif()
+            pauseGif()
         }
-        super.onPause()
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onResume(gifStateBeforePause: GifState?) {
         gifStateBeforePause?.let {
             when (it) {
-                GifState.Play -> startGif()
-                GifState.Pause -> stopGif()
+                GifState.Play -> playGif()
+                GifState.Pause -> pauseGif()
             }
-            gifStateBeforePause = null
         }
     }
 
-    private fun togglePlayPause() {
-        val isGifRunning = gifView.isGifRunning()
-        when (isGifRunning) {
-            true -> gifView.stopGif()
-            else -> gifView.startGif()
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
+        if (isInPictureInPictureMode) {
+            fab.hide()
+            toolbar.visibility = View.GONE
+        } else {
+            fab.show()
+            toolbar.visibility = View.VISIBLE
         }
-        updateOverlayVisibility(isGifRunning)
     }
 
-    private fun startGif() {
-        gifView.startGif()
-        updateOverlayVisibility(false)
-    }
-
-    private fun stopGif() {
-        gifView.stopGif()
-        updateOverlayVisibility(true)
-    }
-
-    private fun updateOverlayVisibility(isVisible: Boolean) {
-        pauseOverlay.visibility = when (isVisible) {
-            true -> View.VISIBLE
-            false -> View.GONE
+    public override fun onUserLeaveHint() {
+        if (true) { // For instance, we could enter PiP only if GIF is playing
+            goToPictureInPictureMode()
         }
+    }
+
+    override fun setupUi() {
+        super.setupUi()
+        fab.setOnClickListener { goToPictureInPictureMode() }
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(GifAction.ViewRandom.action)
+        intentFilter.addAction(GifAction.Play.action)
+        intentFilter.addAction(GifAction.Pause.action)
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter)
+    }
+
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        super.onDestroy()
+    }
+
+    private fun goToPictureInPictureMode() {
+        enterPictureInPictureMode(buildPictureInPictureParams())
+    }
+
+    private fun buildPictureInPictureParams(): PictureInPictureParams {
+        val imgWidth = gifView.drawable.intrinsicWidth
+        val imgHeight = gifView.drawable.intrinsicHeight
+        val aspectRatio: String = Integer.toString(imgWidth) + ":" + Integer.toString(imgHeight)
+
+        return PictureInPictureParams.Builder()
+                .setAspectRatio(Rational.parseRational(aspectRatio))
+                .setActions(listOf(buildRandomizerAction(), buildPlayPauseAction()))
+                .build()
     }
 
     private fun buildRandomizerAction(): RemoteAction {
         val randomizerIntent = IntentBuilder.randomGif(this)
+        randomizerIntent.setClass(this, GifService::class.java)
         return RemoteAction(
                 Icon.createWithResource(this, android.R.drawable.ic_menu_rotate),
                 "Random",
                 "Random",
-                PendingIntent.getActivity(this, 0, randomizerIntent, 0)
+                PendingIntent.getService(this, 0, randomizerIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         )
     }
 
@@ -166,36 +137,17 @@ class GifActivity : AppCompatActivity() {
             true -> R.string.content_description_pause
             false -> R.string.content_description_play
         })
+        playPauseIntent.setClass(this, GifService::class.java)
         return RemoteAction(
                 playPauseIcon,
                 playPauseDescription,
                 playPauseDescription,
-                PendingIntent.getActivity(this, 0, playPauseIntent, 0))
+                PendingIntent.getService(this, 0, playPauseIntent, PendingIntent.FLAG_UPDATE_CURRENT))
     }
 
-    private fun buildPictureInPictureParams(): PictureInPictureParams {
-        val imgWidth = gifView.drawable.intrinsicWidth
-        val imgHeight = gifView.drawable.intrinsicHeight
-        val aspectRatio: String = Integer.toString(imgWidth) + ":" + Integer.toString(imgHeight)
-
-        return PictureInPictureParams.Builder()
-                .setAspectRatio(Rational.parseRational(aspectRatio))
-                .setActions(listOf(buildRandomizerAction(), buildPlayPauseAction()))
-                .build()
-    }
-
-    private fun goToPictureInPictureMode() {
-        enterPictureInPictureMode(buildPictureInPictureParams())
-    }
-
-    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
-        if (isInPictureInPictureMode) {
-            fab.hide()
-            toolbar.visibility = View.GONE
-        } else {
-            fab?.show()
-            toolbar.visibility = View.VISIBLE
+    private inner class RemoteActionBroadcastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            this@GifActivity.onNewIntent(intent)
         }
     }
-
 }

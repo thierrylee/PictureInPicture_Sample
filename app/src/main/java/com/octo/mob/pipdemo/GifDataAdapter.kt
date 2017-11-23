@@ -1,10 +1,9 @@
-package com.octo.mob.pipdemo.gif
+package com.octo.mob.pipdemo
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.octo.mob.pipdemo.R
 import kotlinx.android.synthetic.main.listitem_gif_data.view.*
 
 class GifDataAdapter(private val listener: OnClickGifDataListener) : RecyclerView.Adapter<GifDataViewHolder>() {
