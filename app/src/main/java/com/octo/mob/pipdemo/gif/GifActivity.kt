@@ -40,6 +40,21 @@ class GifActivity : AbstractGifActivity() {
         }
     }
 
+    override fun setupUi() {
+        super.setupUi()
+        fab.setOnClickListener { goToPictureInPictureMode() }
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(GifAction.ViewRandom.action)
+        intentFilter.addAction(GifAction.Play.action)
+        intentFilter.addAction(GifAction.Pause.action)
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter)
+    }
+
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        super.onDestroy()
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
@@ -82,21 +97,6 @@ class GifActivity : AbstractGifActivity() {
         }
     }
 
-    override fun setupUi() {
-        super.setupUi()
-        fab.setOnClickListener { goToPictureInPictureMode() }
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(GifAction.ViewRandom.action)
-        intentFilter.addAction(GifAction.Play.action)
-        intentFilter.addAction(GifAction.Pause.action)
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter)
-    }
-
-    override fun onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-        super.onDestroy()
-    }
-
     private fun goToPictureInPictureMode() {
         enterPictureInPictureMode(buildPictureInPictureParams())
     }
@@ -117,8 +117,8 @@ class GifActivity : AbstractGifActivity() {
         randomizerIntent.setClass(this, GifService::class.java)
         return RemoteAction(
                 Icon.createWithResource(this, android.R.drawable.ic_menu_rotate),
-                "Random",
-                "Random",
+                getString(R.string.content_description_random),
+                getString(R.string.content_description_random),
                 PendingIntent.getService(this, 0, randomizerIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         )
     }
