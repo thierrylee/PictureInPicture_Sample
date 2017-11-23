@@ -7,4 +7,6 @@
     <string name="content_description_pause">Pause</string>
     <string name="content_description_play">Play</string>
     <string name="content_description_random">Random</string>
+
+    <string name="another_pip_activity">Another Activity</string>
 </resources>
