@@ -90,14 +90,24 @@ class GifActivity : AbstractGifActivity() {
         }
     }
 
-    public override fun onUserLeaveHint() {
-        if (true) { // For instance, we could enter PiP only if GIF is playing
+    override fun onUserLeaveHint() {
+        if (true) { // For instance, we could enter PiP depending on a setting
             goToPictureInPictureMode()
         }
     }
 
+    override fun onGifStateChanged(isPlaying: Boolean) {
+        updatePictureInPictureParams()
+    }
+
     private fun goToPictureInPictureMode() {
         enterPictureInPictureMode(buildPictureInPictureParams())
+    }
+
+    private fun updatePictureInPictureParams() {
+        if (isInPictureInPictureMode) {
+            setPictureInPictureParams(buildPictureInPictureParams())
+        }
     }
 
     private fun buildPictureInPictureParams(): PictureInPictureParams {

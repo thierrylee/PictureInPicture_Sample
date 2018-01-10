@@ -36,6 +36,7 @@ abstract class AbstractGifActivity : AppCompatActivity(), GifDisplay {
 
     abstract protected fun onPause(gifStateBeforePause: GifState)
     abstract protected fun onResume(gifStateBeforePause: GifState?)
+    abstract protected fun onGifStateChanged(isPlaying: Boolean)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,7 +82,7 @@ abstract class AbstractGifActivity : AppCompatActivity(), GifDisplay {
         updateOverlayVisibility(false)
     }
 
-    private fun togglePlayPause() {
+    fun togglePlayPause() {
         val isGifRunning = gifView.isGifRunning()
         when (isGifRunning) {
             true -> pauseGif()
@@ -94,6 +95,7 @@ abstract class AbstractGifActivity : AppCompatActivity(), GifDisplay {
             true -> View.VISIBLE
             false -> View.GONE
         }
+        onGifStateChanged(gifView.isGifRunning())
     }
 
     private fun setupDependencies() {
